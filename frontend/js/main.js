@@ -1,12 +1,10 @@
 import { setupControls } from './controls.js';
-import { setupSocket } from './socket.js';
 import { setupVisualization } from './visualization/index.js';
 import { renderGrid } from './grid.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     setupControls();
     setupVisualization();
-    setupSocket();
    
 
     // Set default values for graph type, rows, and cols
@@ -17,3 +15,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Render default 5x5 grid
     renderGrid(5, 5);
 });
+

@@ -67,8 +67,6 @@ def handle_run_algorithm(data):
     if isinstance(end_node, (list, tuple)):
         end_node = f"{end_node[0]},{end_node[1]}"
 
- 
-
     if start_node not in graph or end_node not in graph:
         emit('algo_step', {'error': 'Start or end node not found in the graph.'})
         return

@@ -1,4 +1,5 @@
-// filepath: frontend/js/visualization/codePanel.js
+import { toggleCollapse } from './collapse.js';
+
 export function renderCodePanel(codeString, highlightLines = []) {
     const codeDisplay = document.getElementById('code-display');
     codeDisplay.innerHTML = '';
@@ -14,7 +15,7 @@ export function renderCodePanel(codeString, highlightLines = []) {
             collapseStartIdx = idx;
             htmlLines.push(
                 `<span class="collapse-toggle" data-collapse-idx="${collapseStartIdx}">
-                    <button class="collapse-btn" onclick="window.toggleCollapse(${collapseStartIdx})">▼ Collapse</button>
+                    <button class="collapse-btn" data-collapse-idx="${collapseStartIdx}">▼ Collapse</button>
                     ${escapeHtml(line)}
                 </span>`
             );
@@ -40,9 +41,19 @@ export function renderCodePanel(codeString, highlightLines = []) {
     pre.appendChild(code);
     codeDisplay.appendChild(pre);
 
-    // Prism highlight
-    if (window.Prism && window.Prism.highlightElement) {
-        window.Prism.highlightElement(code);
+    // Attach collapse event listeners
+    setTimeout(() => {
+        codeDisplay.querySelectorAll('.collapse-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = btn.getAttribute('data-collapse-idx');
+                toggleCollapse(idx);
+            });
+        });
+    }, 0);
+
+    // Prism highlight (use global Prism if available)
+    if (typeof Prism !== 'undefined' && Prism.highlightElement) {
+        Prism.highlightElement(code);
     }
 
     // Highlight specific lines (after Prism renders)
@@ -69,20 +80,3 @@ function escapeHtml(text) {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
 }
-
-// Add this to window so inline onclick works
-window.toggleCollapse = function(idx) {
-    let collapsed = false;
-    document.querySelectorAll(`.collapsible-${idx}`).forEach(el => {
-        if (el.style.display === 'none') {
-            el.style.display = '';
-            collapsed = false;
-        } else {
-            el.style.display = 'none';
-            collapsed = true;
-        }
-    });
-    // Change button text
-    const btn = document.querySelector(`.collapse-toggle[data-collapse-idx="${idx}"] .collapse-btn`);
-    if (btn) btn.textContent = collapsed ? '► Expand' : '▼ Collapse';
-};
