@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graph Algorithm Visualizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <!-- Prism.js theme and plugins -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <header>
+        <h1 class="app-title">Graph Algorithm Visualizer</h1>
+    </header>
+    <div id="main-content" class="main-flex">
+        <!-- Column 1: Graph and State Panels -->
+        <section class="col-graph">
+            <div class="graph-panel">
+                <h2>Grid Visualization</h2>
+                <div class="graph-visualization-wrapper">
+                    <div id="grid-container" class="grid-container"></div>
+                </div>
+                <div class="info-panel">
+                    <strong>Start:</strong> <span id="start-coord"></span>
+                    <strong>End:</strong> <span id="end-coord"></span>
+                </div>
+                <div id="message-box" class="message-box"></div>
+                <div class="flex gap-2 mt-2">
+                    <button id="step-forward-btn" class="btn btn-purple">Step Forward</button>
+                    <button id="reset-btn" class="btn btn-gray">Reset</button>
+                </div>
+            </div>
+            <div class="state-panel">
+                <div>
+                    <h3>Visited Order</h3>
+                    <div id="visited-set-panel" class="state-chip-panel"></div>
+                </div>
+                <div>
+                    <h3>Queue/Stack</h3>
+                    <div id="queue-panel" class="state-chip-panel"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Column 2: Controls -->
+        <section class="col-controls">
+            <h2>Graph & Algorithm Controls</h2>
+            <div class="controls-panel">
+                <label for="graph-type-select">Graph Type:</label>
+                <select id="graph-type-select">
+                    <option value="grid">Grid</option>
+                    <option value="edge_list">Edge List</option>
+                </select>
+
+                <div id="edge-list-input-container" class="hidden">
+                    <label for="edge-list-input">Edge List (one edge per line, comma separated):</label>
+                    <textarea id="edge-list-input" rows="3"></textarea>
+                </div>
+
+                <label for="rows-input">Rows:</label>
+                <input type="number" id="rows-input" value="10" min="2" max="50">
+
+                <label for="cols-input">Cols:</label>
+                <input type="number" id="cols-input" value="10" min="2" max="50">
+
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="node-select" id="start-radio" checked>
+                        Select Start
+                    </label>
+                    <label>
+                        <input type="radio" name="node-select" id="end-radio">
+                        Select End
+                    </label>
+                </div>
+
+                <label for="algorithm-select">Algorithm:</label>
+                <select id="algorithm-select">
+                    <option value="bfs">BFS</option>
+                    <option value="dfs">DFS</option>
+                </select>
+
+                <button id="visualize-btn" class="btn btn-green">Visualize Graph</button>
+            </div>
+        </section>
+
+        <!-- Column 3: Code Display -->
+        <section class="col-code">
+            <h2>Algorithm Code</h2>
+            <div id="code-display"></div>
+            <div id="debug-panel" class="debug-panel"></div>
+        </section>
+    </div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+
+</body>
+</html>

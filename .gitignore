@@ -1,0 +1,15 @@
+Virtual environment
+/venv
+
+Python artifacts
+pycache
+*.pyc
+*.pyo
+
+IDE files
+.vscode
+.idea
+
+Other OS files
+.DS_Store
+Thumbs.db
