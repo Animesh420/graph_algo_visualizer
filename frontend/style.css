@@ -413,3 +413,16 @@ section {
     font-size: 1em;
     margin-right: 0.5em;
 }
+
+.inline-line-number {
+    color: #888;
+    display: inline-block;
+    width: 2em;
+    text-align: right;
+    margin-right: 0.5em;
+    user-select: none;
+    font-size: 0.95em;
+}
+.collapsible {
+    display: none !important;
+}

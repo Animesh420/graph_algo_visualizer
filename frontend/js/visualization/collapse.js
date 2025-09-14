@@ -1,5 +1,5 @@
 export function toggleCollapse(idx) {
-    let collapsed = false;
+    let collapsed = true;
     document.querySelectorAll(`.collapsible-${idx}`).forEach(el => {
         if (el.style.display === 'none') {
             el.style.display = '';
@@ -9,7 +9,5 @@ export function toggleCollapse(idx) {
             collapsed = true;
         }
     });
-    // Change button text
-    const btn = document.querySelector(`.collapse-toggle[data-collapse-idx="${idx}"] .collapse-btn`);
-    if (btn) btn.textContent = collapsed ? '► Expand' : '▼ Collapse';
+    return collapsed;
 }

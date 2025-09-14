@@ -4,79 +4,78 @@ export function renderCodePanel(codeString, highlightLines = []) {
     const codeDisplay = document.getElementById('code-display');
     codeDisplay.innerHTML = '';
 
-    // Split code into lines for collapse logic
-    const lines = typeof codeString === 'string' ? codeString.split('\n') : [];
-    let inCollapsed = false;
-    let collapseStartIdx = null;
-    let htmlLines = [];
+    const lines = codeString.split('\n');
+    let collapseIdx = lines.findIndex(line => line.includes('COLLAPSE-START'));
 
-    lines.forEach((line, idx) => {
-        if (line.includes('COLLAPSE START')) {
-            collapseStartIdx = idx;
-            htmlLines.push(
-                `<span class="collapse-toggle" data-collapse-idx="${collapseStartIdx}">
-                    <button class="collapse-btn" data-collapse-idx="${collapseStartIdx}">▼ Collapse</button>
-                    ${escapeHtml(line)}
-                </span>`
+    // If no COLLAPSE-START, highlight everything
+    if (collapseIdx === -1) collapseIdx = lines.length;
+
+    // Code before COLLAPSE-START (always visible)
+    const visibleCode = lines.slice(0, collapseIdx).join('\n');
+    // COLLAPSE-START line (toggle button)
+    const collapseStartLine = lines[collapseIdx] || '';
+    // Code after COLLAPSE-START (collapsed)
+    const collapsedCode = lines.slice(collapseIdx + 1).join('\n');
+
+    // Visible section
+    const preVisible = document.createElement('pre');
+    preVisible.className = 'line-numbers';
+    preVisible.setAttribute('data-start', '1');
+    if (highlightLines.length === 2 && highlightLines[0] <= collapseIdx) {
+        preVisible.setAttribute('data-line', `${highlightLines[0]}-${Math.min(highlightLines[1], collapseIdx)}`);
+    }
+    const codeVisible = document.createElement('code');
+    codeVisible.className = 'language-python';
+    codeVisible.textContent = visibleCode;
+    preVisible.appendChild(codeVisible);
+    codeDisplay.appendChild(preVisible);
+
+    // Collapsed section (if any)
+    if (collapseIdx < lines.length) {
+        // Toggle button (shows COLLAPSE-START line)
+        const toggleDiv = document.createElement('div');
+        toggleDiv.className = 'collapse-toggle';
+        toggleDiv.style.cursor = 'pointer';
+        toggleDiv.textContent = collapseStartLine + ' ▼';
+        codeDisplay.appendChild(toggleDiv);
+
+        // Collapsed code block
+        const preCollapsed = document.createElement('pre');
+        preCollapsed.className = 'line-numbers collapsible';
+        preCollapsed.setAttribute('data-start', (collapseIdx + 2).toString());
+        preCollapsed.style.display = 'none';
+        // Highlight lines only if they are in the collapsed section
+        if (highlightLines.length === 2 && highlightLines[1] > collapseIdx) {
+            preCollapsed.setAttribute(
+                'data-line',
+                `${Math.max(1, highlightLines[0] - collapseIdx - 1)}-${highlightLines[1] - collapseIdx - 1}`
             );
-            inCollapsed = true;
-        } else if (line.includes('COLLAPSE END')) {
-            htmlLines.push(`<span class="collapse-end">${escapeHtml(line)}</span>`);
-            inCollapsed = false;
-            collapseStartIdx = null;
-        } else if (inCollapsed && collapseStartIdx !== null) {
-            htmlLines.push(`<span class="collapsible collapsible-${collapseStartIdx}" style="display:none">${escapeHtml(line)}</span>`);
-        } else {
-            htmlLines.push(`<span>${escapeHtml(line)}</span>`);
         }
-    });
+        const codeCollapsed = document.createElement('code');
+        codeCollapsed.className = 'language-python';
+        codeCollapsed.textContent = collapsedCode;
+        preCollapsed.appendChild(codeCollapsed);
+        codeDisplay.appendChild(preCollapsed);
 
-    // Prepare code block with Prism.js classes
-    const pre = document.createElement('pre');
-    pre.className = 'line-numbers';
-    pre.setAttribute('data-start', '1');
-    const code = document.createElement('code');
-    code.className = 'language-python';
-    code.innerHTML = htmlLines.join('\n');
-    pre.appendChild(code);
-    codeDisplay.appendChild(pre);
-
-    // Attach collapse event listeners
-    setTimeout(() => {
-        codeDisplay.querySelectorAll('.collapse-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = btn.getAttribute('data-collapse-idx');
-                toggleCollapse(idx);
-            });
+        // Toggle logic
+        toggleDiv.addEventListener('click', () => {
+            if (preCollapsed.style.display === 'none') {
+                preCollapsed.style.display = '';
+                toggleDiv.textContent = collapseStartLine + ' ▲';
+            } else {
+                preCollapsed.style.display = 'none';
+                toggleDiv.textContent = collapseStartLine + ' ▼';
+            }
         });
-    }, 0);
 
-    // Prism highlight (use global Prism if available)
+        // Prism highlight for collapsed section
+        if (typeof Prism !== 'undefined' && Prism.highlightElement) {
+            Prism.highlightElement(codeCollapsed);
+        }
+    }
+
+    // Prism highlight for visible section
     if (typeof Prism !== 'undefined' && Prism.highlightElement) {
-        Prism.highlightElement(code);
+        Prism.highlightElement(codeVisible);
     }
-
-    // Highlight specific lines (after Prism renders)
-    if (highlightLines.length === 2) {
-        const [start, end] = highlightLines;
-        setTimeout(() => {
-            const rows = pre.querySelectorAll('.line-numbers-rows > span');
-            rows.forEach((span, idx) => {
-                const lineNum = idx + 1;
-                if (lineNum >= start && lineNum <= end) {
-                    span.classList.add('prism-highlighted-line');
-                } else {
-                    span.classList.remove('prism-highlighted-line');
-                }
-            });
-        }, 0);
-    }
-}
-
-// Helper to escape HTML special characters
-function escapeHtml(text) {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
 }
